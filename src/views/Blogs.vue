@@ -1,15 +1,20 @@
 <template>
   <div class="blogs">
     <h1>Blog Posts</h1>
-    <post-lists v-if="showPosts" :posts="posts" />
-    <button @click="showPosts = !showPosts">Toggle Posts</button>
-    <button @click="posts.pop()">Delete Post</button>
+    <div v-if="loading">Loading Posts</div>
+    <div v-if="error">{{ error }}</div>
+    <template v-if="posts.length > 0">
+      <post-lists v-if="showPosts" :posts="posts" />
+      <button @click="showPosts = !showPosts">Toggle Posts</button>
+      <button @click="posts.pop()">Delete Post</button>
+    </template>
   </div>
 </template>
 
 
 <script>
 import { ref }  from 'vue'
+import useGetPosts from '../composibles/useGetPosts'
 import PostLists from '@/components/PostList'
 export default {
   name: 'Blogs',
@@ -18,23 +23,15 @@ export default {
   },
   setup() {
     const showPosts = ref(true)
+    const { loading, error, posts, load } = useGetPosts();
 
-    const posts = ref([
-      {
-        id: 1,
-        title: 'Post 1',
-        body: 'This is the first post'
-      },
-      {
-        id: 2,
-        title: 'Post 2',
-        body: 'This is the second post'
-      }
-    ])
+    load()
 
     return {
       posts,
-      showPosts
+      showPosts,
+      error,
+      loading
     }
   },
 }
